@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("login/", login.as_view(), name="login"),
     path("api/posts/", Post_Managament.as_view(), name="posts"),
+    path("api/posts/<int:id>", postread.as_view(), name="post"),
     # path("logout/", logout.as_view(), name="logout"),
 
 ]

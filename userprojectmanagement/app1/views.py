@@ -98,7 +98,7 @@ class Post_Managament(APIView):
         context = {}
 
         try:
-            posts = pd.DataFrame(Post.objects.filter(author = request.user.id).values())
+            posts = pd.DataFrame(Post.objects.all().values())
             context['posts'] = posts.to_dict(orient='records')
             # context['message'] =  f' name : {posts.title} Created successfully...'
             return Response(context, status=status.HTTP_200_OK)
@@ -109,3 +109,52 @@ class Post_Managament(APIView):
         
         
 
+class postslist(APIView):
+    def get(self,request):
+        context = {}
+
+        try:
+            posts = pd.DataFrame(Post.objects.all().values())
+            context['posts'] = posts.to_dict(orient='records')
+            # context['message'] =  f' name : {posts.title} Created successfully...'
+            return Response(context, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            context['error'] = str(e)
+            return Response(context, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class postread(APIView):
+    def get(self,request,id):
+        context = {}
+
+        try:
+            posts = pd.DataFrame(Post.objects.filter(id = id).values())
+            context['posts'] = posts.to_dict(orient='records')
+            # context['message'] =  f' name : {posts.title} Created successfully...'
+            return Response(context, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            context['error'] = str(e)
+            return Response(context, status=status.HTTP_400_BAD_REQUEST)
+    def put(self,request,id):
+        context = {}
+        data = json.loads(request.body)
+        try:
+            posts = Post.objects.get(id = id)
+            if posts.author.id != request.user.id:
+                context['message'] =  f' you are not having access to update this posts.'
+            # posts.author = data.get('author',posts.author)
+            old_post = posts.title
+            posts.title = data.get('title', posts.title)
+            posts.body = data.get('body',posts.body)
+            posts.save()
+            
+            context['message'] =  f' name :{old_post}--> {posts.title} updated successfully...'
+            return Response(context, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            context['error'] = str(e)
+            return Response(context, status=status.HTTP_400_BAD_REQUEST)
+        
+    
